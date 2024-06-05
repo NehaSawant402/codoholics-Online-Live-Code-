@@ -1,0 +1,533 @@
+/* Global style */
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 10px;
+    color: white;
+}
+
+body {
+    font-family: serif;
+    background-color: rgb(31, 30, 30);
+}
+
+
+/* home.html styling */
+
+#login {
+    width: 300px;
+    height: 330px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(36, 36, 46);
+    padding: 70px 30px;
+    border-radius: 30px;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    position: absolute;
+    top: -15%;
+    left: calc(50% - 50px);
+    background-color: #efefef;
+    
+}
+h1 {
+    margin: 0 auto;
+    padding: 0 0 20px;
+    text-align: center;
+    font-size: 2.4em;
+}
+#login p {
+    margin: 0 auto;
+    padding: 0;
+    font-weight: bold;
+    font-size: 1.7em;
+}
+form div {
+    margin: 5px;
+}
+.join {
+    margin-top: 12px;
+}
+#login input[type="text"] {
+    border: none;
+    background: transparent;
+    border-bottom: 1px groove #efefef;
+    outline: none;
+    height: 30px;
+    color: #efefef;
+    font-size: 16px;
+}
+
+
+#login button[type="submit"] {
+    border: none;
+    outline: none;
+    margin: 8px;
+    margin-top: 12px;
+    padding: 6px;
+    cursor: pointer;
+    background-color: rgb(43, 201, 90);
+    color: white;
+    border-radius: 5px; 
+    font-size: 1.7em;
+}
+#login button[type="submit"]:hover {
+    background-color: rgb(33, 156, 70);
+}
+
+
+/*change style of room.html page*/
+
+/*HEADER STYLING*/
+
+/* header style */
+
+header .container {
+    position: relative;
+    z-index: 1000;
+    height: 7rem;
+    width: 100%;
+    background-color: rgb(49, 48, 48);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+ul {
+    list-style-type: none;
+}
+
+header .logo {
+    height: 6rem;
+    width: 6rem;
+    margin-left: 3rem;
+    cursor: pointer;
+    font-family: sans-serif;
+}
+header .logo-img {
+    width: 100%;
+    border-radius: 50%;
+    background-color: #333;
+    border: 1px solid #444;
+}
+header .logo-img:hover {
+    background-color: #444;
+}
+
+.text-logo {
+    margin-top: 1rem;
+}
+
+.ham-btn {
+    position: relative;
+    right: 2rem;
+    height: 4rem;
+    width: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.ham-line {
+    width: 3.2rem;
+    height: .3rem;
+    background-color: white;
+    transition: all .5s ease-in-out;
+}
+.ham-btn:hover .ham-line {
+    background-color: rgb(33, 156, 70);
+}
+.ham-btn:hover .ham-line::before {
+    background-color: rgb(33, 156, 70);
+}
+.ham-btn:hover .ham-line::after {
+    background-color: rgb(33, 156, 70);
+}
+
+.ham-line::before, .ham-line::after {
+    position: absolute;
+    content: '';
+    width: 3.2rem;
+    height: .3rem;
+    background-color: white;
+    transition: all .3s ease-in-out;
+}
+
+.ham-line::before {
+    transform: translateY(-1rem);
+}
+.ham-line::after {
+    transform: translateY(1rem);
+}
+
+.ham-btn.open .ham-line {
+    background: transparent;
+    transition: all .3s ease-in;
+}
+.ham-btn.open .ham-line::before {
+    transform: rotate(45deg);
+    transition: all .3s ease-in;
+}
+.ham-btn.open .ham-line::after {
+    transform: rotate(-45deg);
+    transition: all .3s ease-in;
+}
+.nav-list {
+    position: absolute;
+    top: 7rem;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background-color: #fff;
+    overflow: hidden;
+    transition: all .3s ease-in-out;
+}
+
+.nav-list ul {
+    padding: 1rem;
+    width: 100%;
+    height: inherit;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-around;
+}
+
+.nav-list ul li {
+    padding: 1rem;
+    cursor: pointer;
+}
+.nav-list ul li:hover {
+    background-color: #efefef;
+}
+
+.nav-list ul li a {
+    font-size: 1.5rem;
+    color: #555;
+    text-decoration: none;
+}
+
+
+@media screen and (min-width: 1000px) {
+
+    .ham-btn {
+        display: none;
+    }
+     
+/* Height of nav bar is 7rem */
+    .nav-list {
+        top: 0;
+        left: 40%;
+        width: 60%;
+        height: 7rem;
+        background-color: rgb(49, 48, 48);
+    }
+    
+    .nav-list ul li {
+        text-align: center;
+    }
+    .nav-list ul li:hover {
+        background-color: rgb(33, 156, 70);
+    }
+    
+    .nav-list ul li a {
+        color: white;
+        font-size: 1.7rem;
+    }
+}
+
+
+/* main content grid */
+
+.grid {
+    display: grid;
+    grid-template-columns: 200px 50% auto;
+    height: calc(100vh - 7rem);
+
+    
+}
+.grid1 {
+    background-color: #222;
+    text-align: center;
+    padding: 5px;
+}
+.grid1 h2 {
+    color: #ddd;
+}
+
+.grid2 {
+    display: grid;
+}
+
+.grid3 {
+    background-color: rgb(36, 36, 46);
+    display: grid;
+    grid-template-rows: 50% 50%;
+    overflow: hidden;
+}
+.grid3 .box1 {
+    border-bottom: 2px solid rgb(29, 29, 36);
+    font-size: 2rem;
+}
+.box1 #output {
+    margin: 1rem;
+}
+.box1 #compile {
+    background-color: rgb(43, 201, 90);
+    padding: 5px;
+    font-size: 1.5rem;
+    color:#fff;
+}
+#compile:hover {
+    cursor: pointer;
+}
+.box1 select {
+    font-size: 1.5rem;
+    padding: 5px;
+}
+
+.grid3 .box2 {
+    display: grid;
+    font-size: 2rem;
+    padding: 1rem;
+}
+#outputheading {
+    margin-top: 1rem;
+    margin-left: 5px;
+}
+
+/* style grid items */
+
+textarea {
+    width: 100%;
+    background-color: rgb(41, 41, 41);
+    color: white;
+    font-size: 2rem;
+    padding-top: 5px;
+    padding-left: 10px;
+    border: none;
+}
+  
+      /* Style for the textarea when focused */
+      textarea:focus {
+        outline: none; /* Remove the default focus outline */
+      }
+
+
+
+/* room members */
+.room-grid {
+    background-color: #393636;
+    padding: 3px;
+    margin-bottom: 5px;
+}
+
+.grid1 {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: auto;
+}
+
+.copy-btn {
+    background-color: #25de41;
+    padding: 5px;
+    width: 50%;
+    margin-bottom: 3px;
+    font-size: 1.5em;
+    color: white;
+    cursor: pointer;
+}
+
+ul li {
+    color: red;
+    font-size: 1.6em;
+}
+
+/* room members */
+.room-members {
+    width: 100%;
+    overflow: auto;
+}
+.member {
+    width: 98%;
+    margin: 1px auto;
+    padding: 5px;
+    font-size: 1.8em;
+    cursor: pointer;
+}
+.member-dp {
+    position: relative;
+    width: 120px;
+    height: 90px;
+    margin: 3px auto;
+    font-size: 3em;
+    background-color: rgb(200, 51, 51);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+.member-dp .owner-options {
+    position: absolute;
+    font-size: 0.4em;
+    width: 23px;
+    height: 23px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(203, 42, 42);
+    top: -10px;
+    right: -10px;
+    border-radius: 50%;
+    user-select: none;
+}
+.member-dp .owner-options:hover {
+    background-color: red;
+}
+.member-dp .owner-permissions-options {
+    top : -15px;
+    left: -10px;
+    font-size: 0.4em;
+    width: 30px;
+    height: 30px;
+    background-color: rgb(203, 42, 42);
+}
+.member-dp .owner-permissions-options:hover {
+    font-size: 0.40em;
+}
+
+#chats {
+    display: grid;
+}
+#logs {
+    display: none;
+}
+#notes {
+    display: none;
+}
+#video-call {
+    display: none;
+}
+
+.box2 {
+    display: flex;
+}
+#chats {
+    display: grid;
+    grid-template-rows: 1fr 35px;
+    width: 100%;
+}
+#sender-btns {
+    width: 100%;
+}
+#chat-container {
+    overflow: auto;
+}
+#user-chat {
+    width: 85%;
+    height: 30px;
+    padding: 5px;
+    border-radius: 15px;
+    outline: none;
+    font-size: 0.7em;
+}
+#chat-submit {
+    height: 30px;
+    width: 10%;
+    border-radius: 5px;
+    background-color: rgb(43, 201, 90);
+    color: white;
+    font-size: 0.7em;
+}
+
+#user-notes {
+    height: 100%;
+    width: 100%;
+}
+#user-inputs {
+    width: 100%;
+    height: 100%;
+}
+
+.highlight {
+    background-color: #1e9330;
+}
+
+
+/* Sticky join request */
+#join-req {
+    position: fixed;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    max-width: 13em;
+    font-size: 1.5em;
+    bottom: 1em;
+    left: 0;
+    padding: 0.5em;
+    background-color: white;
+    color: rgb(23, 17, 17);
+    border: 0.2em solid rgb(69, 66, 66);
+    border-radius: 0.5em;
+    transition: cubic-bezier(1, 0, 0, 1);
+}
+#join-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.fixed-btn {
+    cursor: pointer;
+    padding: 0.5em;
+    margin: 0.2em;
+    border-radius: 0.2em;
+    border-right: 0.1em solid gray;
+    border-bottom: 0.1em solid gray;
+    color: white;
+}
+#accept-join {
+    background-color: #25de41;
+}
+#accept-join:hover {
+    background-color: #1bb432;
+}
+#reject-join {
+    background-color: rgb(237, 32, 32);
+}
+#reject-join:hover {
+    background-color: rgb(158, 18, 18);
+}
+
+/* ide theme */
+.CodeMirror {
+    width: 100%;
+    background-color: rgb(41, 41, 41) !important;
+    font-size: 2rem;
+    padding-top: 5px;
+    padding-left: 10px;
+    border: none;
+    height: 90vh !important;
+}
+
+#waiting {
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.waitbox {
+    width: 70vw;
+    height: 40vh;
+    text-align: center;
+    font-family: monospace;
+    font-size: 3em;
+}

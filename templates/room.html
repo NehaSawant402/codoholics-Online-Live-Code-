@@ -1,0 +1,495 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="approved">
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo" class="logo-img" />
+            </div>
+            <div class="ham-btn">
+                <div class="ham-line"></div>
+            </div>
+            <div class="nav-list">
+                <ul>
+                    <li class="item" onclick="chats()"><a href="#">CHAT</a></li>
+                    <li class="item" onclick="logs()"><a href="#">LOGS</a></li>
+                    <li class="item" onclick="notes()"><a href="#">NOTES</a></li>
+                    <li class="item" onclick="videoCall()"><a href="#">INPUT</a></li>
+                    <li class="item" onclick="downloadCode()"><a href="#">DOWNLOAD CODE</a></li>
+                    <li class="item" onclick="Notes()"><a href="#">DOWNLOAD Notes</a></li>
+
+                </ul>
+            </div>
+        </div>
+    </header>
+    
+    <div class="grid" id="main-grid">
+        <div class="grid1">
+            <div class="room-grid">
+                <h2>Room ID </h2>
+                <h1 id="roomID" style="display:none">{{ room }}</h1>
+                <button class="copy-btn" id="copy-btn" onclick="copyToClipboard()">Copy ID</button>
+            </div>
+            <div class="room-members" id="room-members">
+                <div class="member">
+                    <div class="member-dp">R <div class="owner-options">x</div> <div class="owner-options owner-permissions-options">&#x270F;</div></div>
+                    <div class="member-name">Rushikesh rajendra salve</div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="grid2">
+            <textarea name="ide" id="editor" cols="30" rows="10"></textarea>
+        </div>
+    
+        <div class="grid3">
+            <div class="box1">
+                <select name="langSelector" id="lang">
+                    {% for lang in languages %}
+                    <option value={{lang}}>{{ lang }}</option>
+                    {% endfor %}
+                </select>
+                <select name="themeSelector" id="themer">
+                    <option value="blackboard">backboard</option>
+                    <option value="ambiance">ambiance</option>
+                    <option value="duotone-dark">duotone</option>
+                    <option value="shadowfox">shadowfox</option>
+                    <option value="zenburn">zenburn</option>
+                    <option value="monokai">monokai</option>
+                </select>
+    
+                <button id="compile">Run</button>
+    
+    
+                <div id="output">
+                    Output:
+                    <div id="outputheading"></div>
+                </div>
+            </div>
+    
+            <div class="box2">
+                <div id="chats">
+                    <div id="chat-container">
+                        <!--<p><b>Rushi: </b>Hello</p>-->
+                    </div>
+                    <div id="sender-btns">
+                        <input type="text" id="user-chat" />
+                        <button id="chat-submit"> Send </button>
+                    </div>
+                </div>
+    
+                <div id="logs">
+                    logs
+                </div>
+                <div id="notes">
+                    <textarea name="notes" id="user-notes" placeholder="Enter some notes"></textarea>
+                </div>
+                <div id="video-call">
+                    <textarea name="inputs" id="user-inputs" placeholder="Enter inputs if you have any"></textarea>
+                </div>
+            </div>
+    
+        </div>
+    
+    </div>
+</div>
+
+<div id="waiting" style="display: none">
+    <div class="waitbox">
+        <h3>Waiting for owner to accept...</h3>
+    </div>
+</div>
+
+
+    <script>
+        /*********************************************************************/
+        /********                 Define global variables            *********/
+        /*********************************************************************/
+
+        //Sends the value of editor to the flask server and emmits message event
+        //editor and syntax highlighting with code mirror
+        let editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+            lineNumbers: false,
+            mode: "python",
+            theme: "blackboard",
+            autoMode: "false",
+            readOnly: "true"
+        });
+        let isProgrammaticChange = false;
+        let compile = document.getElementById("compile");
+        let userNotes = document.getElementById("user-notes");
+        let langSelector = document.getElementById("lang")
+        let themer = document.getElementById("themer")
+        let p = document.createElement("p")
+        let inputs = document.getElementById("user-inputs");
+        
+        /*********************************************************************/
+        /*******                  user defined functions               *******/
+        /*********************************************************************/
+
+        let setMode = (language) => {
+            let mode
+            switch(language) {
+                case "java":
+                    mode = "text/x-java"
+                    break
+                case "C":
+                    mode = "text/x-csrc"
+                    break
+                case "C++":
+                    mode = "text/x-c++src"
+                    break
+                case "python":
+                    mode = "python"
+                default:
+                    mode = "python"
+                }
+            return mode
+        }
+
+        //Function to create request (accept or reject request)
+        const createREQ = (requester_name, requester_sid) => {
+            requester_name = requester_name
+            requester_sid = requester_sid
+            let join_request = document.createElement("div")
+            let join_req_txt = document.createElement("div")
+            let h3 = document.createElement("h3")
+            let join_grid = document.createElement("div")
+            let accept_join = document.createElement("div")
+            let reject_join = document.createElement("div")
+
+            //add ids
+            join_request.id = "join-req"
+            join_req_txt.id = "join-req-txt"
+            join_grid.id = "join-grid"
+            accept_join.id = "accept-join"
+            reject_join.id = "reject-join"
+            accept_join.classList.add("fixed-btn")
+            reject_join.classList.add("fixed-btn")
+
+            //add data
+            let req_text = requester_name + " wants to join"
+            h3.innerHTML = req_text
+            accept_join.innerHTML = "Accept"
+            reject_join.innerHTML = "Reject"
+
+            join_req_txt.appendChild(h3)
+            join_grid.appendChild(accept_join)
+            join_grid.appendChild(reject_join)
+
+            join_request.appendChild(join_req_txt)
+            join_request.appendChild(join_grid)
+
+            document.getElementById("main-grid").appendChild(join_request)
+
+            document.getElementById("accept-join").addEventListener("click", () => {
+                socketio.emit("user_approved", {requester_name: requester_name, requester_sid: requester_sid})             
+            });
+            document.getElementById("reject-join").addEventListener("click", () => {
+                socketio.emit("user_rejected", {requester_name: requester_name, requester_sid: requester_sid})             
+            });
+        };
+
+        //Function to show who joined and left
+        const createMSG = (name, msg, members, owner) => {
+
+            const p = document.createElement("p");
+            p.innerText = name + msg;
+            document.getElementById("logs").appendChild(p);
+
+            const room_members = document.getElementById("room-members");
+            room_members.innerHTML = "";
+            for (let memberName of members) {
+                let member = document.createElement("div");
+                let member_dp = document.createElement("div");
+                let member_name = document.createElement("div");
+                let owner_options = document.createElement("div");
+                let owner_permissions = document.createElement("div");
+
+                member.classList.add("member");
+                member_dp.classList.add("member-dp");
+                member_name.classList.add("member-name");
+                if (memberName != owner) owner_options.classList.add("owner-options", "owner-options-remove");
+                member_dp.innerHTML = memberName[0];
+                member_name.innerHTML = memberName;
+                if (memberName != owner) owner_options.innerHTML = "x";
+                member.appendChild(member_dp);
+                member.appendChild(member_name);
+                if (memberName != owner) member_dp.appendChild(owner_options);
+                document.getElementById("room-members").appendChild(member);
+                owner_options.style.display = "none";
+                owner_permissions.style.display = "none";
+
+                if (memberName != owner) owner_permissions.classList.add("owner-permissions-options", "owner-options")
+                if (memberName != owner) owner_permissions.innerHTML = "&#x270F;";
+                if (memberName != owner) member_dp.appendChild(owner_permissions);
+                if (memberName != owner) owner_permissions.setAttribute("permission", "no")
+                //editor option is on for owner by default
+                if (memberName == owner) {
+                    editor.setOption("readOnly", false)
+                    owner_permissions.permission = true
+                }
+
+                //add event listen
+                let ownerOptions = document.getElementsByClassName("owner-options-remove")
+                let ownerPermissions = document.getElementsByClassName("owner-permissions-options")
+                for (let i = 0; i < ownerOptions.length; i++) {
+                    //alert("inside loop")
+                    ownerOptions[i].addEventListener("click", () => {
+                        //alert("before")
+                        let user = ownerOptions[i].parentNode.parentNode.getElementsByClassName("member-name")[0].textContent.trim();
+                        //alert(user)
+                        socketio.emit("removeUser", { user: user })
+                        //alert(user)
+                    });
+                    
+                    ownerPermissions[i].addEventListener("click", () => {
+                        let user = ownerPermissions[i].parentNode.parentNode.getElementsByClassName("member-name")[0].textContent.trim();
+                        if (ownerPermissions[i].permission == "no") {
+                            ownerPermissions[i].style.backgroundColor = "green"
+                            ownerPermissions[i].permission = "yes"
+                        }
+                        else {
+                            ownerPermissions[i].style.backgroundColor = "rgb(203, 42, 42)"
+                            ownerPermissions[i].permission = "no"
+                        }
+                        socketio.emit("letUserWrite", {user: user, permission: ownerPermissions[i].permission})
+                    });
+                }
+            }
+        };
+
+        /*********************************************************************/
+        /*********                define Event Listeners             *********/
+        /*********************************************************************/
+        
+        // When user enters anything in ide
+        editor.on("change", () => {
+            if(!isProgrammaticChange) {
+                editor.getValue();
+                socketio.emit("message", { code: editor.getValue()})
+            }
+        });
+
+        //send chat when user clicks on send
+        document.getElementById("chat-submit").addEventListener("click", function (event) {
+            let user = document.getElementById("user-chat");
+            let text = user.value;
+            user.value = "";
+            if (text == "") return;
+            socketio.emit("addchat", { text: text })
+        });
+
+        // When user enters anything in notes
+        inputs.addEventListener("input", () => {
+            socketio.emit("getInputs", { inputs: inputs.value })
+        });
+
+        //When user selects language
+        langSelector.addEventListener("change", () => {
+            let mode = setMode(langSelector.value)
+            editor.setOption("mode", mode)
+        })
+        //When user selects theme
+        themer.addEventListener("change", () => {
+            editor.setOption("theme", themer.value)
+        })
+
+
+        //send chat when user presses enter, to flask with addchat event
+        document.getElementById("user-chat").addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                let user = document.getElementById("user-chat");
+                let text = user.value;
+                user.value = "";
+                if (text == "") return;
+                socketio.emit("addchat", { text: text })
+            }
+        });
+
+                //runs when user clicks on run button
+        compile.addEventListener("click", () => {
+            let lang = document.getElementById("lang");
+            let user_inputs = document.getElementById("user-inputs").value
+            //alert(lang.value)
+            let output = document.getElementById("outputheading")
+            output.innerHTML = "Compiling..."
+            socketio.emit("changeOutput", { code: editor.getValue(), language: lang.value, user_input: user_inputs })
+        });
+
+        /*********************************************************************/
+        /*******                 handshake to the server               *******/
+        /*********************************************************************/
+
+        let socketio = io(); //Connects flask socket and emmits connect event
+
+        //Handles message event and data sent from flask server
+        socketio.on("message", (data) => {
+        createMSG(data.user, data.message, data.members, data.owner)
+        });
+
+        /************************************************/
+        /********          make user join         *******/
+        socketio.on("accept_change", (data) => {
+            socketio.emit("display_to_requester", {requester_sid: data["requester_sid"], status: "accept"})
+        });
+        socketio.on("reject_change", (data) => {
+            socketio.emit("display_to_requester", {requester_sid: data["requester_sid"], status: "reject"})
+        });
+
+        socketio.on("display_room_requester", () => {
+            document.getElementById("waiting").style.display = "none";
+            document.getElementById("approved").style.display = "block";  
+            editor.focus()         
+            editor.setOption("readOnly", true)
+        });
+        socketio.on("redirect_requester", () => {
+            window.location.href="/"        
+        });
+
+        socketio.on("remove_requestbox", () => {
+            document.getElementById("main-grid").removeChild(document.getElementById("join-req"))
+        });
+
+        socketio.on("removedUser", (data) => {
+        //alert(data.user)
+        window.location.href = "/"
+        });
+
+        /********          end of making user join         *******/
+        /*********************************************************/
+
+
+        //handle change output event
+        socketio.on("changeOutput", (data) => {
+            //let output = JSON.stringify(data.output)
+            document.getElementById("outputheading").innerHTML = data.output
+        });
+
+        /************************************************/
+        /********         user permission         *******/
+
+        socketio.on("grantUser", (data) => {
+            socketio.emit("grant_permission_to", {sid: data["sid"], permission:data["permission"]})
+            //alert(data["permission"])
+        });
+
+        socketio.on("granted_permission", (data) => {
+            //alert(data["permission"])
+            let permission = data.permission
+            if (permission == "no") {
+                editor.setOption("readOnly", true)
+                //alert(permission)
+
+            }
+            else if(permission == "yes") {
+                editor.setOption("readOnly", false)
+                //alert(permission)
+            }
+            else {
+                editor.setOption("readOnly", true)
+                //alert("nothing came here")
+            }
+            
+
+        });
+        /********         end of granting permissions       *******/
+        /*********************************************************/
+
+        socketio.on("template-renderer", (data) => {
+            document.getElementById("approved").innerHTML=data.template
+
+        });
+
+
+        socketio.on("appendchat", (data) => {
+            let username = data["name"];
+            let message = data["text"];
+            let container = document.getElementById("chat-container");
+            let p = document.createElement("p");
+            let text = "<b>" + username + ": </b>" + message;
+            p.innerHTML = text;
+            container.appendChild(p);
+        });
+
+        
+        //handle change value event
+        socketio.on("changevalue", (data) => {
+            isProgrammaticChange = true;
+            const cursorPos = editor.getCursor()
+            editor.setValue(data["message"])
+            editor.setCursor(cursorPos)
+            isProgrammaticChange = false;
+
+            let logs = document.getElementById("logs")
+            p.innerText = data["user"] + " has edited recently"
+
+            logs.appendChild(p)
+
+            let roomMembers = document.getElementById('room-members');
+            // Get all the member elements
+            let memberdp = roomMembers.getElementsByClassName('member-dp');
+
+            for (let i = 0; i < memberdp.length; i++) {
+                let memberName = memberdp[i].parentNode.getElementsByClassName("member-name")[0].textContent.trim();
+                if (memberName == data["user"]) {
+                    memberdp[i].classList.add("highlight");
+                }
+                else {
+                    memberdp[i].classList.remove("highlight");
+                }
+            }
+        });
+
+
+        //Function gets the notes to all the users in room
+        socketio.on("changeinputs", (data) => {
+            inputs.value = data["inputs"]
+        });
+
+
+        //Get the message to owner only
+        socketio.on("onlyOwner", (data) => {
+        let owner_options = document.getElementsByClassName("owner-options")
+        for (let i = 0; i < owner_options.length; i++) {
+            let memberName = owner_options[i].parentNode.parentNode.getElementsByClassName("member-name")[0].textContent.trim();
+            if (data.owner != memberName) {
+                owner_options[i].style.display = "block";
+            }
+        }
+        });
+
+
+        //Request to the owner
+        socketio.on("user_req", (data) => {
+            createREQ(data.requester_name, data.requester_sid)
+        });
+
+    </script>
+
+    <script>
+        window.onload=function() {
+            //let edit = document.getElementById("editor");
+            editor.focus()
+
+            let status = "{{ req }}"
+            if(status == "approved") {
+                document.getElementById("waiting").style.display = "none";
+                document.getElementById("approved").style.display = "block";
+            }
+            else {
+                document.getElementById("waiting").style.display = "flex";
+                document.getElementById("approved").style.display = "none";
+            }
+
+            let code = `{{ code|safe }}`
+            let output = "{{ output }}"
+            isProgrammaticChange = true;
+            editor.setValue(code)
+            isProgrammaticChange = false;
+            document.getElementById('outputheading').innerHTML = output;
+        }
+    </script>
+
+{% endblock %}

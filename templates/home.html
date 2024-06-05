@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div id="login">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" class="avatar" />
+        <h1>Create / Join room</h1>
+        <form method="post">
+            <div>
+                <p>Username: </p>
+                <input type="text" placeholder="Enter username" name="username" value="{{username}}" />
+            </div>
+            <div class="join">
+                <p>Room ID: </p>
+                <input type="text" placeholder="Enter room ID" name="roomid" value="{{roomid}}" />
+            </div>
+            <button type="submit" name="create" class="create-btn">Create a room</button>
+            <button type="submit" name="join">Join</button>
+            
+            
+            {% if err %}
+            <ul>
+                <li>{{ err }}</li>
+            </ul>
+            {% endif %}
+        </form>
+    </div>
+
+    
+{% endblock %}
